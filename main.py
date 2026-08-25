@@ -1,4 +1,5 @@
 import re
+import sys
 
 class Token:
     def __init__(self,tipo,valor,linha):
@@ -54,7 +55,7 @@ keywords={
     'in': 'IN', 'inherits': 'INHERITS', 'isvoid': 'ISVOID', 'let': 'LET',
     'loop': 'LOOP', 'pool': 'POOL', 'then': 'THEN', 'while': 'WHILE',
     'case': 'CASE', 'esac': 'ESAC', 'new': 'NEW', 'of': 'OF', 'not': 'NOT',
-    'true': 'true', 'false': 'false'
+    'true': 'TRUE', 'false': 'FALSE'
 }
 
 def analisador_lexico(codigo):
@@ -88,4 +89,23 @@ def analisador_lexico(codigo):
         if not match:
             raise ValueError(f"Erro léxico: caractere inválido '{codigo[posicao]}' na linha {linha_atual}")
     return 1
-analisador_lexico(text)
+
+if __name__ == "__main__":
+    
+    if len(sys.argv) < 2:
+        print("Uso incorreto. Formato esperado:")
+        print("python3 main.py <arquivo.cl>")
+        sys.exit(1) # erro
+
+    nome_arquivo = sys.argv[1]
+
+    try:
+
+        with open(nome_arquivo, 'r') as arquivo:
+            codigo_fonte = arquivo.read()
+        
+        
+    except FileNotFoundError:
+        print(f"Erro: O arquivo '{nome_arquivo}' não foi encontrado.")
+
+analisador_lexico(codigo_fonte)
