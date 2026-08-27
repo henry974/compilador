@@ -25,7 +25,7 @@ text = r"""class Main inherits IO {
 """
 regex_tokens = [
     (r"[ \n\f\r\t\v]+",None),                   #ignora
-    (r"--[^\n]*|\(\*.*?\*\)",None),                      #ignora
+    (r"--[^\n]*", None),                      #ignora
     (r'"([^"\\\n\x00]|\\[^\x00])*"','STRING'),
     (r"\d+",'INTEGER'),
     (r"[A-Z][a-zA-Z0-9_]*",'TYPE_IDENTIFIER'),
@@ -65,8 +65,28 @@ def analisador_lexico(codigo):
     linha_atual = 1
 
     while posicao < tamanho:
+        char = codigo[posicao:posicao+2]
+        w
+        if char == '(*':
+            contador = 1
+            print(contador)
+            posicao += 2
+            while contador > 0 and posicao < tamanho:
+                if codigo[posicao] == '\n':
+                    linha_atual +=1
+                char = codigo[posicao:posicao+2]
+                if char == '(*':
+                    contador +=1
+                    posicao += 2
+                elif char == '*)':
+                    contador -=1
+                    posicao += 2
+                else :
+                    posicao += 1
+            if contador > 0:
+                raise ValueError(f"Erro léxico: EOF encontrado, comentário de bloco não foi fechado.")  
+            continue      
         match = None
-
         for regex,tipo in regex_tokens:
             padrao = re.compile(regex,re.DOTALL)
             match = padrao.match(codigo,posicao)
@@ -79,7 +99,9 @@ def analisador_lexico(codigo):
                     if token_lower in keywords:
                         tipo = keywords[token_lower]
 
+                
                 if tipo is not None :
+
                     novo_token = Token(tipo,token_capturado,linha_atual)
                     print(novo_token)
 

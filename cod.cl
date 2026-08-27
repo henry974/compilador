@@ -1,7 +1,7 @@
 (*
  This file presents a fairly large example of Cool programming. The
 class List defines the names of standard list operations ala Scheme:
-car, cdr, cons, isNil, rev, sort, rcons (add an element to the end of
+car, cdr, cons(*ahahah(*llloooolll*)aha*), isNil, rev, sort, rcons (add an element to the end of
 the list), and print_list. In the List class most of these functions
 are just stubs that abort if ever called. The classes Nil and Cons
 inherit from List and define the same operations, but now as
@@ -23,7 +23,7 @@ moderately large lists can be quite slow.
 
 Class List inherits IO { 
  (* Since abort() returns Object, we need something of
-	 type Bool at the end of the block to satisfy the typechecker. 
+	 type Bool at (* aninhado *) the end of the block to satisfy the typechecker. 
  This code is unreachable, since abort() halts the program. *)
 	isNil() : Bool { { abort(); true; } };
 
