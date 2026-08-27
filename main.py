@@ -68,7 +68,7 @@ def analisador_lexico(codigo):
         char = codigo[posicao:posicao+2]
         if char == '(*':
             contador = 1
-            print(contador)
+            #print(contador)
             posicao += 2
             while contador > 0 and posicao < tamanho:
                 if codigo[posicao] == '\n':
