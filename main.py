@@ -104,8 +104,7 @@ if __name__ == "__main__":
         with open(nome_arquivo, 'r') as arquivo:
             codigo_fonte = arquivo.read()
         
-        
+        analisador_lexico(codigo_fonte)
     except FileNotFoundError:
         print(f"Erro: O arquivo '{nome_arquivo}' não foi encontrado.")
 
-analisador_lexico(codigo_fonte)
