@@ -86,7 +86,7 @@ def analisador_lexico(codigo):
 
                     novo_token = Token(tipo,token_capturado,linha_atual)
                     tokens.append(novo_token)
-                    print(novo_token)
+                    #print(novo_token)
 
                 linha_atual += token_capturado.count('\n')
                 posicao = match.end()
