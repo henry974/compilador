@@ -136,8 +136,7 @@ class Parser:
         self.consume() # Consome o token '{' (LBRACE)
         
         exprs = []
-        # Um bloco na linguagem COOL é uma sequência de expressões, 
-        # onde cada expressão obrigatoriamente termina com ponto-e-vírgula (;)
+        # Um bloco em COOL é uma sequência de expressões, onde cada expressão obrigatoriamente termina com ponto-e-vírgula (;)
         while self.peek().tipo != "RBRACE":
             exprs.append(self.parse_expr())
             self.expect("SEMI")
@@ -227,8 +226,7 @@ class Parser:
         elif token.tipo == "NEW":
             return self.parse_new()
         
-        # Se não for uma palavra-chave de controle estrutural, 
-        # desce para a cadeia matemática (começando na prioridade mais baixa: atribuição)
+        # Se não for uma palavra-chave de controle estrutural, desce para a cadeia matemática (começando na prioridade mais baixa: atribuição)
         return self.parse_assign()
 
     def parse_assign(self):
@@ -269,8 +267,7 @@ class Parser:
         # Adição e Subtração (+, -)
         esq = self.parse_mul()
         
-        # Usamos 'while' aqui porque você pode ter 1 + 2 - 3 + 4
-        # Isso garante a "associatividade à esquerda"
+        # Usamos 'while' aqui porque você pode ter 1 + 2 - 3 + 4 que garante a "associatividade à esquerda"
         while self.peek().tipo in ["PLUS", "MINUS"]:
             token = self.consume()
             dir = self.parse_mul()
@@ -330,9 +327,8 @@ class Parser:
                     
             self.expect("RPAREN")
             
-            # A mágica do encadeamento: o resultado desta chamada de método
-            # vira o receptor (o lado esquerdo) da próxima iteração do while!
-            esq = Dispatch(esq, tipo_estatico, metodo, argumentos)
+            
+            esq = Dispatch(esq, tipo_estatico, metodo, argumentos) #aqui ocorre o encadeamento resultado da chamada vira receptor da próxima interação
             
         return esq
 
