@@ -1,6 +1,7 @@
 import re
 import sys
 from tokens import Token
+from errors import LexerError
 
 
 
@@ -65,7 +66,7 @@ def analisador_lexico(codigo):
                 else :
                     posicao += 1
             if contador > 0:
-                raise ValueError(f"Erro léxico: EOF encontrado, comentário de bloco não foi fechado.")  
+                raise LexerError(f"Erro léxico: EOF encontrado, comentário de bloco não foi fechado.")  
             continue      
         match = None
         for regex,tipo in regex_tokens:
@@ -91,7 +92,7 @@ def analisador_lexico(codigo):
                 posicao = match.end()
                 break
         if not match:
-            raise ValueError(f"Erro léxico: caractere inválido '{codigo[posicao]}' na linha {linha_atual}")
+            raise LexerError(f"Erro léxico: caractere inválido '{codigo[posicao]}' na linha {linha_atual}")
     tokens.append(Token("EOF","$",linha_atual))
     return tokens
 
