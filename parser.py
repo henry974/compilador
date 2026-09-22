@@ -35,11 +35,25 @@ class Parser:
 
 
     # regras de gramática
+    
     def parse_program(self):
         classes = []
         while self.peek().tipo != "EOF":
             classes.append(self.parse_class())
         return Program(classes)
 
-    
+    def parse_class(self):
+        self.expect("CLASS")
+        nome = self.expect("TYPE_IDENTIFIER").valor
+        pai = None
+        if self.match("INHERITS"):
+            pai = self.expect("TYPE_IDENTIFIER").valor
+        self.expect("LBRACE")
+        features = []
+        while self.peek().tipo != "RBRACE":
+            features.append(self.parse_feature())
+            self.expect("SEMI")
+        self.expect("RBRACE")
+        self.expect("SEMI")
+        return ClassNode(nome, pai, features)
     
