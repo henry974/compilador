@@ -2,6 +2,7 @@ import sys
 from lexer import analisador_lexico
 from parser import Parser
 from errors import LexerError, ParseError
+from semantic import AnalisadorSemantico
 
 def imprimir_ast(no, nivel=0):
     prefixo = "  " * nivel
@@ -67,8 +68,8 @@ def main():
         sys.exit(1)
 
     #  imprimir tokens pra debug
-    for t in tokens:
-        print(t)
+    #for t in tokens:
+    #   print(t)
     print("-" * 40)
 
     # 2) Sintático
@@ -80,7 +81,16 @@ def main():
         sys.exit(1)
 
     print("Parse OK!")
-    imprimir_ast(ast)
+    # 3) Semântico
+    erros = AnalisadorSemantico(ast).analisar()
+    if erros:
+        for e in erros:
+            print(e)
+        print(f"{len(erros)} erro(s) semântico(s).")
+        sys.exit(1)
+
+    print("Análise semântica OK!")
+    #imprimir_ast(ast)
 
 if __name__ == "__main__":
     main()

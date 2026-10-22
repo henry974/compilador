@@ -136,7 +136,8 @@ class Parser:
         self.consume() # Consome o token '{' (LBRACE)
         
         exprs = []
-        # Um bloco em COOL é uma sequência de expressões, onde cada expressão obrigatoriamente termina com ponto-e-vírgula (;)
+        # Um bloco na linguagem COOL é uma sequência de expressões, 
+        # onde cada expressão obrigatoriamente termina com ponto-e-vírgula (;)
         while self.peek().tipo != "RBRACE":
             exprs.append(self.parse_expr())
             self.expect("SEMI")
@@ -210,23 +211,9 @@ class Parser:
         return Case(expr_principal, ramos)
 
     def parse_expr(self):
-        token = self.peek()
-        
-        # Estruturas de Controlo e Fluxo
-        if token.tipo == "IF":
-            return self.parse_if()
-        elif token.tipo == "WHILE":
-            return self.parse_while()
-        elif token.tipo == "LBRACE": 
-            return self.parse_block()
-        elif token.tipo == "LET":
-            return self.parse_let()
-        elif token.tipo == "CASE":
-            return self.parse_case()
-        elif token.tipo == "NEW":
-            return self.parse_new()
-        
-        # Se não for uma palavra-chave de controle estrutural, desce para a cadeia matemática (começando na prioridade mais baixa: atribuição)
+        # Toda expressão desce pela cadeia de precedência (assign -> not -> comparação -> ...).
+        # if/while/{ }/let/case/new são tratados em parse_primary, para que também possam
+        # aparecer como operandos (ex.: new Foo = x, 1 + new Int, isvoid new Foo).
         return self.parse_assign()
 
     def parse_assign(self):
@@ -267,11 +254,13 @@ class Parser:
         # Adição e Subtração (+, -)
         esq = self.parse_mul()
         
-        # Usamos 'while' aqui porque você pode ter 1 + 2 - 3 + 4 que garante a "associatividade à esquerda"
+        # Usamos 'while' aqui porque você pode ter 1 + 2 - 3 + 4
+        # Isso garante a "associatividade à esquerda"
         while self.peek().tipo in ["PLUS", "MINUS"]:
             token = self.consume()
             dir = self.parse_mul()
             esq = BinaryOp(token.valor, esq, dir)
+            esq.linha = token.linha
             
         return esq
 
@@ -283,6 +272,7 @@ class Parser:
             token = self.consume()
             dir = self.parse_isvoid()
             esq = BinaryOp(token.valor, esq, dir)
+            esq.linha = token.linha
             
         return esq
 
@@ -315,7 +305,8 @@ class Parser:
             else:
                 self.consume() # Consome o ponto simples
                 
-            metodo = self.expect("OBJECT_IDENTIFIER").valor
+            tok_metodo = self.expect("OBJECT_IDENTIFIER")
+            metodo = tok_metodo.valor
             self.expect("LPAREN")
             
             argumentos = []
@@ -327,12 +318,26 @@ class Parser:
                     
             self.expect("RPAREN")
             
-            
-            esq = Dispatch(esq, tipo_estatico, metodo, argumentos) #aqui ocorre o encadeamento resultado da chamada vira receptor da próxima interação
+            # A mágica do encadeamento: o resultado desta chamada de método
+            # vira o receptor (o lado esquerdo) da próxima iteração do while!
+            esq = Dispatch(esq, tipo_estatico, metodo, argumentos)
+            esq.linha = tok_metodo.linha
             
         return esq
 
     def parse_primary(self):
+        # Construções que começam com palavra-chave (cada parse_* consome o próprio token inicial)
+        construcoes = {
+            "IF": self.parse_if,
+            "WHILE": self.parse_while,
+            "LBRACE": self.parse_block,
+            "LET": self.parse_let,
+            "CASE": self.parse_case,
+            "NEW": self.parse_new,
+        }
+        if self.peek().tipo in construcoes:
+            return construcoes[self.peek().tipo]()
+
         token = self.consume()
         
         if token.tipo == "INTEGER":
@@ -366,4 +371,25 @@ class Parser:
             return expr
             
         raise ParseError(f"Expressão inválida iniciada com {token.tipo}", token.linha)
-    
+
+
+# ---------------------------------------------------------------------------
+# Números de linha na AST (usados pelo analisador semântico nas mensagens de erro).
+# Cada método parse_* passa a marcar o nó que devolve com a linha em que ele começou
+# (se o nó ainda não tiver uma linha própria).
+# ---------------------------------------------------------------------------
+def _com_linha(metodo):
+    def envoltorio(self, *args, **kwargs):
+        linha = self.peek().linha
+        no = metodo(self, *args, **kwargs)
+        if no is not None and not hasattr(no, "linha"):
+            no.linha = linha
+        return no
+    return envoltorio
+
+for _nome in ("parse_program", "parse_class", "parse_feature", "parse_formal",
+              "parse_if", "parse_while", "parse_block", "parse_let", "parse_new",
+              "parse_case", "parse_expr", "parse_assign", "parse_not",
+              "parse_comparison", "parse_add", "parse_mul", "parse_isvoid",
+              "parse_neg", "parse_dispatch", "parse_primary"):
+    setattr(Parser, _nome, _com_linha(getattr(Parser, _nome)))
