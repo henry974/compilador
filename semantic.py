@@ -1,6 +1,4 @@
 """
-Analisador semântico da linguagem Cool.
-
 Entrada : a AST produzida pelo parser (ast_nodes.py).
 Saída   : lista de SemanticError (vazia = programa semanticamente correto).
           Além disso, cada nó de expressão da AST ganha o atributo `tipo_expr`
@@ -55,9 +53,8 @@ class AnalisadorSemantico:
         self.classe_atual = None  # InfoClasse da classe sendo verificada
         self.linha_atual = None   # última linha conhecida (fallback para mensagens)
 
-    # ------------------------------------------------------------------
     # utilitários
-    # ------------------------------------------------------------------
+    
     def erro(self, mensagem, linha=None):
         self.erros.append(SemanticError(mensagem, linha))
 

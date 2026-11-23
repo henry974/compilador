@@ -373,11 +373,9 @@ class Parser:
         raise ParseError(f"Expressão inválida iniciada com {token.tipo}", token.linha)
 
 
-# ---------------------------------------------------------------------------
 # Números de linha na AST (usados pelo analisador semântico nas mensagens de erro).
 # Cada método parse_* passa a marcar o nó que devolve com a linha em que ele começou
 # (se o nó ainda não tiver uma linha própria).
-# ---------------------------------------------------------------------------
 def _com_linha(metodo):
     def envoltorio(self, *args, **kwargs):
         linha = self.peek().linha
