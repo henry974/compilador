@@ -66,7 +66,7 @@ def analisador_lexico(codigo):
                 else :
                     posicao += 1
             if contador > 0:
-                raise LexerError(f"Erro léxico: EOF encontrado, comentário de bloco não foi fechado.")  
+                raise LexerError(f"Erro léxico: EOF encontrado, comentário de bloco não foi fechado.",linha_atual)  
             continue      
         match = None
         for regex,tipo in regex_tokens:
@@ -79,7 +79,10 @@ def analisador_lexico(codigo):
                 if ((tipo == 'OBJECT_IDENTIFIER') or (tipo == 'TYPE_IDENTIFIER')):
                     token_lower = token_capturado.lower()
                     if token_lower in keywords:
-                        tipo = keywords[token_lower]
+                        if token_lower in ('true', 'false') and tipo == 'TYPE_IDENTIFIER':
+                            pass
+                        else: 
+                            tipo = keywords[token_lower]
 
                 
                 if tipo is not None :
@@ -92,7 +95,7 @@ def analisador_lexico(codigo):
                 posicao = match.end()
                 break
         if not match:
-            raise LexerError(f"Erro léxico: caractere inválido '{codigo[posicao]}' na linha {linha_atual}")
+            raise LexerError(f"Erro léxico: caractere inválido '{codigo[posicao]}' na linha {linha_atual}",linha_atual)
     tokens.append(Token("EOF","$",linha_atual))
     return tokens
 

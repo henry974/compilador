@@ -83,13 +83,18 @@ class AnalisadorSemantico:
                 return self.classes[c].metodos[nome]
         return None
 
-    def buscar_variavel(self, nome):
-        """Procura primeiro nos escopos locais (do mais interno ao mais externo)
-        e depois nos atributos da classe atual."""
+    def resolver_variavel(self, nome):
+        """Devolve (tipo, origem, classe_dona).origem: 'local' (formal/let/case) ou 'atributo'; (None, None, None) se não existe."""
         for escopo in reversed(self.escopos):
             if nome in escopo:
-                return escopo[nome]
-        return self.buscar_atributo(self.classe_atual.nome, nome)
+                return escopo[nome], "local", None
+        for c in self.ancestrais(self.classe_atual.nome):
+            if nome in self.classes[c].atributos:
+                return self.classes[c].atributos[nome], "atributo", c
+        return None, None, None
+
+    def buscar_variavel(self, nome):
+        return self.resolver_variavel(nome)[0]
 
     # relação de conformidade (T1 <= T2) e menor ancestral comum (lub)
     def conforma(self, t1, t2):
@@ -360,8 +365,9 @@ class AnalisadorSemantico:
     def visitar_Id(self, no):
         linha = self.linha_atual
         if no.nome == "self":
+            no.origem, no.classe_dona = "self", None
             return SELF_TYPE
-        tipo = self.buscar_variavel(no.nome)
+        tipo, no.origem, no.classe_dona = self.resolver_variavel(no.nome)
         if tipo is None:
             self.erro(f"identificador '{no.nome}' não declarado", linha)
             return NO_TYPE
@@ -374,7 +380,7 @@ class AnalisadorSemantico:
         if no.nome == "self":
             self.erro("não é possível atribuir a 'self'", linha)
             return tipo_valor
-        tipo_var = self.buscar_variavel(no.nome)
+        tipo_var, no.origem, no.classe_dona = self.resolver_variavel(no.nome)
         if tipo_var is None:
             self.erro(f"atribuição a identificador não declarado '{no.nome}'", linha)
         elif not self.conforma(tipo_valor, tipo_var):

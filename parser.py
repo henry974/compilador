@@ -2,6 +2,24 @@ from tokens import Token
 from ast_nodes import *
 from errors import ParseError
 
+def decodificar_string(literal):
+    """Remove as aspas e processa os escapes do COOL:
+    \\b \\t \\n \\f viram o caractere de controle; \\c (qualquer outro c) vira c;
+    barra seguida de quebra de linha real vira quebra de linha."""
+    corpo = literal[1:-1]
+    saida = []
+    i = 0
+    while i < len(corpo):
+        c = corpo[i]
+        if c == '\\':
+            i += 1
+            prox = corpo[i]
+            saida.append({'b': '\b', 't': '\t', 'n': '\n', 'f': '\f'}.get(prox, prox))
+        else:
+            saida.append(c)
+        i += 1
+    return ''.join(saida)
+
 class Parser:
     def __init__(self,tokens):
         self.tokens = tokens 
@@ -343,7 +361,7 @@ class Parser:
         if token.tipo == "INTEGER":
             return IntLit(int(token.valor))
         elif token.tipo == "STRING":
-            return StringLit(token.valor)
+            return StringLit(decodificar_string(token.valor))
         elif token.tipo == "TRUE":
             return BoolLit(True)
         elif token.tipo == "FALSE":
