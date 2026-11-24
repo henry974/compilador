@@ -1,5 +1,5 @@
 """
-Gerador de código COOL -> Jasmin (bytecode JVM, class version 49).
+Gerador de código COOL -> Jasmin (bytecode JVM; sem .bytecode, o Jasmin usa a versão 45.3, sem StackMapTable).
 
 Entrada : a AST (ast_nodes.py) e o AnalisadorSemantico já executado
           (usamos `analisador.classes` e o atributo `tipo_expr` anotado em cada nó).
@@ -15,9 +15,9 @@ Convenções (ver plano, Fase 0):
     O estático permite o despacho estático (e@T.f()) com invokestatic (Fase 5).
   * classes, construtores e métodos são sempre PUBLIC (CoolRuntime usa reflexão)
 
-Estado do desenvolvimento: Fase 3. Já geram código: literais, `self`, bloco, despacho
-dinâmico, aritmética (+ - * /), complemento (~), not, comparações (< <= =) e `if`
-(adiantado da Fase 6 para permitir testar as comparações).
+Estado do desenvolvimento: Fase 4. Já geram código: literais, `self`, bloco, despacho
+dinâmico, aritmética, ~, not, comparações, `if`, variáveis (formais e atributos),
+atribuição e atributos com valor padrão/inicializador.
 O resto levanta NotImplementedError com a linha do fonte.
 """
 import os
@@ -165,13 +165,39 @@ class GeradorJasmin:
         return "\n".join(self.linhas) + "\n"
 
     def gerar_construtor(self, info):
-        """<init>()V : chama o construtor do pai. (Fase 4: valores padrão + inicializadores.)"""
+        """<init>()V :
+             1) chama o construtor do pai (que inicializa os atributos herdados);
+             2) dá o valor padrão a TODOS os atributos desta classe;
+             3) executa os inicializadores, na ordem de declaração.
+        Os passos 2 e 3 são separados porque, no COOL, um inicializador que lê um atributo
+        declarado depois dele enxerga o valor padrão."""
         self.iniciar_metodo([])
         self.emit("aload_0")
         self.emit(f"invokespecial {classe_jvm(info.pai)}/<init>()V")
-        # TODO Fase 4: atribuir valores padrão e inicializadores dos atributos
+
+        atributos = [f for f in info.no.features if isinstance(f, Attribute)]
+        for attr in atributos:
+            self.emitir_valor_padrao(info, attr)
+        for attr in atributos:
+            if attr.inicializador is not None:
+                self.emit("aload_0")
+                self.expr(attr.inicializador)
+                self.emit(f"putfield {info.nome}/{attr.nome} {OBJ}")
+
         self.emit("return")
         self.escrever_metodo("public <init>()V", LIMITE_PILHA, self.max_locais)
+
+    def emitir_valor_padrao(self, info, attr):
+        """Int -> 0, Bool -> false, String -> "", qualquer outro tipo -> void (null)."""
+        self.emit("aload_0")
+        if attr.tipo in ("Int", "Bool", "String"):
+            classe = classe_jvm(attr.tipo)
+            self.emit(f"new {classe}")
+            self.emit("dup")
+            self.emit(f"invokespecial {classe}/<init>()V")
+        else:
+            self.emit("aconst_null")
+        self.emit(f"putfield {info.nome}/{attr.nome} {OBJ}")
 
     def gerar_novo(self, info):
         """_novo() : devolve uma instância nova desta classe (usado por `new SELF_TYPE`)."""
@@ -241,13 +267,50 @@ class GeradorJasmin:
         self.emit(f'ldc "{escapar_jasmin(no.valor)}"')
         self.emit("invokespecial CoolString/<init>(Ljava/lang/String;)V")
 
-    # ---- self (variáveis comuns: Fase 4) ----
+    # ---- variáveis e atribuição (Fase 4) ----
+    def resolver_variavel(self, nome):
+        """Onde mora a variável `nome` no ponto atual do código?
+        Devolve ("local", slot) para formais/let/case (escopo mais interno primeiro),
+        ("atributo", classe_dona) para atributos (da classe atual ou herdados),
+        ou None se não existir. A classe dona é onde o atributo foi DECLARADO,
+        que é o que getfield/putfield precisam."""
+        for escopo in reversed(self.escopos):
+            if nome in escopo:
+                return ("local", escopo[nome])
+        for classe in self.sem.ancestrais(self.classe_atual.nome):
+            if nome in self.sem.classes[classe].atributos:
+                return ("atributo", classe)
+        return None
+
     def expr_Id(self, no):
         if no.nome == "self":
             self.emit("aload_0")
             return
-        raise NotImplementedError(
-            f"uso da variável '{no.nome}' ainda não implementado (Fase 4) (linha {getattr(no, 'linha', '?')})")
+        var = self.resolver_variavel(no.nome)
+        if var is None:   # o semântico já deveria ter rejeitado
+            raise RuntimeError(f"identificador '{no.nome}' não resolvido na geração de código")
+        tipo, info = var
+        if tipo == "local":
+            self.emit(f"aload {info}")
+        else:
+            self.emit("aload_0")
+            self.emit(f"getfield {info}/{no.nome} {OBJ}")
+
+    def expr_Assign(self, no):
+        """A atribuição também é uma expressão: o valor atribuído fica na pilha."""
+        var = self.resolver_variavel(no.nome)
+        if var is None:
+            raise RuntimeError(f"identificador '{no.nome}' não resolvido na geração de código")
+        tipo, info = var
+        if tipo == "local":
+            self.expr(no.valor)
+            self.emit("dup")
+            self.emit(f"astore {info}")
+        else:
+            self.emit("aload_0")                 # pilha: obj
+            self.expr(no.valor)                  # pilha: obj, valor
+            self.emit("dup_x1")                  # pilha: valor, obj, valor
+            self.emit(f"putfield {info}/{no.nome} {OBJ}")   # pilha: valor
 
     # ---- bloco ----
     def expr_Block(self, no):

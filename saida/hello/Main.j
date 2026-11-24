@@ -33,7 +33,7 @@
   aload_0
   new CoolString
   dup
-  ldc "Hello, world.\n"
+  ldc "Hello, world!\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   areturn
