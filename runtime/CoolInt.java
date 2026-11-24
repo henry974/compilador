@@ -10,6 +10,11 @@ public final class CoolInt extends CoolObject {
         this.value = value;
     }
 
+    /** Atalho estático, útil para o código gerado: CoolInt.of(I)LCoolInt; */
+    public static CoolInt of(int v) {
+        return new CoolInt(v);
+    }
+
     @Override
     public CoolObject _novo() {
         return new CoolInt(0);

@@ -1,5 +1,5 @@
 """
-Gerador de código COOL -> Jasmin (bytecode JVM s).
+Gerador de código COOL -> Jasmin (bytecode JVM, class version 49).
 
 Entrada : a AST (ast_nodes.py) e o AnalisadorSemantico já executado
           (usamos `analisador.classes` e o atributo `tipo_expr` anotado em cada nó).
@@ -15,8 +15,10 @@ Convenções (ver plano, Fase 0):
     O estático permite o despacho estático (e@T.f()) com invokestatic (Fase 5).
   * classes, construtores e métodos são sempre PUBLIC (CoolRuntime usa reflexão)
 
-Estado do desenvolvimento: Fase 2 (esqueleto). Já geram código: literais, `self`,
-bloco e despacho dinâmico. O resto levanta NotImplementedError com a linha do fonte.
+Estado do desenvolvimento: Fase 3. Já geram código: literais, `self`, bloco, despacho
+dinâmico, aritmética (+ - * /), complemento (~), not, comparações (< <= =) e `if`
+(adiantado da Fase 6 para permitir testar as comparações).
+O resto levanta NotImplementedError com a linha do fonte.
 """
 import os
 
@@ -25,6 +27,10 @@ from semantic import SELF_TYPE
 
 LIMITE_PILHA = 64          # profundidade de pilha "generosa" (Fase 9: calcular o valor exato)
 OBJ = "LCoolObject;"       # descritor do tipo apagado
+
+# operador COOL -> instrução JVM
+OPS_ARITMETICOS = {"+": "iadd", "-": "isub", "*": "imul", "/": "idiv"}
+OPS_RELACIONAIS = {"<": "if_icmplt", "<=": "if_icmple"}
 
 # classes básicas do COOL -> classes do runtime em Java
 CLASSES_RUNTIME = {
@@ -267,3 +273,83 @@ class GeradorJasmin:
             self.expr(argumento)
         descritor = f"({OBJ * len(no.argumentos)}){OBJ}"
         self.emit(f"invokevirtual {classe_jvm(classe)}/{no.metodo}{descritor}")
+
+    # ------------------------------------------------------------------
+    # Fase 3: conversões entre objetos COOL e valores primitivos da JVM
+    # ------------------------------------------------------------------
+    def expr_como_int(self, no):
+        """Gera `no` (um Int) e deixa o int primitivo no topo da pilha."""
+        self.expr(no)
+        self.emit("checkcast CoolInt")
+        self.emit("getfield CoolInt/value I")
+
+    def expr_como_bool(self, no):
+        """Gera `no` (um Bool) e deixa o boolean primitivo (0/1) no topo da pilha."""
+        self.expr(no)
+        self.emit("checkcast CoolBool")
+        self.emit("getfield CoolBool/value Z")
+
+    def empacotar_int(self):
+        """int primitivo no topo -> objeto CoolInt."""
+        self.emit("invokestatic CoolInt/of(I)LCoolInt;")
+
+    def empacotar_bool(self):
+        """boolean primitivo no topo -> objeto CoolBool."""
+        self.emit("invokestatic CoolBool/of(Z)LCoolBool;")
+
+    # ---- operadores binários ----
+    def expr_BinaryOp(self, no):
+        if no.op in OPS_ARITMETICOS:
+            self.expr_como_int(no.esq)
+            self.expr_como_int(no.dir)
+            self.emit(OPS_ARITMETICOS[no.op])      # idiv por zero lança ArithmeticException
+            self.empacotar_int()
+
+        elif no.op in OPS_RELACIONAIS:
+            self.expr_como_int(no.esq)
+            self.expr_como_int(no.dir)
+            l_verdade = self.novo_rotulo("Lverdade")
+            l_fim = self.novo_rotulo("Lfim")
+            self.emit(f"{OPS_RELACIONAIS[no.op]} {l_verdade}")
+            self.emit("iconst_0")
+            self.emit(f"goto {l_fim}")
+            self.rotulo(l_verdade)
+            self.emit("iconst_1")
+            self.rotulo(l_fim)
+            self.empacotar_bool()
+
+        elif no.op == "=":
+            # Int/Bool/String comparam por valor, o resto por referência: o runtime decide
+            self.expr(no.esq)
+            self.expr(no.dir)
+            self.emit("invokestatic CoolRuntime/eq(LCoolObject;LCoolObject;)Z")
+            self.empacotar_bool()
+
+        else:
+            raise NotImplementedError(f"operador binário '{no.op}' desconhecido")
+
+    # ---- operadores unários ----
+    def expr_UnaryOp(self, no):
+        if no.op == "~":
+            self.expr_como_int(no.expr)
+            self.emit("ineg")
+            self.empacotar_int()
+        elif no.op == "not":
+            self.expr_como_bool(no.expr)
+            self.emit("iconst_1")
+            self.emit("ixor")                      # 0 <-> 1
+            self.empacotar_bool()
+        else:
+            raise NotImplementedError(f"operador unário '{no.op}' desconhecido")
+
+    # ---- if (adiantado da Fase 6) ----
+    def expr_If(self, no):
+        l_senao = self.novo_rotulo("Lsenao")
+        l_fim = self.novo_rotulo("Lfim")
+        self.expr_como_bool(no.cond)
+        self.emit(f"ifeq {l_senao}")
+        self.expr(no.entao)
+        self.emit(f"goto {l_fim}")
+        self.rotulo(l_senao)
+        self.expr(no.senao)
+        self.rotulo(l_fim)

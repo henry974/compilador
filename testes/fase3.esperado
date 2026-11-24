@@ -1,0 +1,21 @@
+7
+9
+5
+3
+-5
+8
+-2147483648
+6
+ok 1 < 2
+ok 2 < 2 e falso
+ok 2 <= 2
+ok 3 <= 2 e falso
+ok 3 = 3
+ok 3 = 4 e falso
+ok strings iguais
+ok strings diferentes
+ok true = true
+ok not false
+ok not true e falso
+ok not (1 = 2)
+fim
