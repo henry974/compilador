@@ -15,10 +15,10 @@ Convenções (ver plano, Fase 0):
     O estático permite o despacho estático (e@T.f()) com invokestatic (Fase 5).
   * classes, construtores e métodos são sempre PUBLIC (CoolRuntime usa reflexão)
 
-Estado do desenvolvimento: Fase 6. Já geram código: literais, `self`, bloco, aritmética,
-~, not, comparações, `if`, `while`, variáveis (formais e atributos), atribuição, atributos
-com valor padrão/inicializador e despacho completo (dinâmico e estático, com checagem de void).
-Faltam: let, case, new, isvoid (Fase 7). Esses levantam NotImplementedError com a linha do fonte.
+Estado do desenvolvimento: Fase 7 -- todos os nós da AST geram código: literais, `self`,
+bloco, aritmética, ~, not, comparações, `if`, `while`, `let`, `case`, `new`, `isvoid`,
+variáveis (formais, atributos, let, case), atribuição, atributos com valor padrão/inicializador
+e despacho completo (dinâmico e estático, com checagem de void).
 """
 import os
 
@@ -195,16 +195,20 @@ class GeradorJasmin:
         self.emit("return")
         self.escrever_metodo("public <init>()V", LIMITE_PILHA, self.max_locais)
 
-    def emitir_valor_padrao(self, info, attr):
-        """Int -> 0, Bool -> false, String -> "", qualquer outro tipo -> void (null)."""
-        self.emit("aload_0")
-        if attr.tipo in ("Int", "Bool", "String"):
-            classe = classe_jvm(attr.tipo)
+    def empilhar_valor_padrao(self, tipo):
+        """Empilha o valor padrão de um tipo: Int -> 0, Bool -> false, String -> "",
+        qualquer outro tipo -> void (null)."""
+        if tipo in ("Int", "Bool", "String"):
+            classe = classe_jvm(tipo)
             self.emit(f"new {classe}")
             self.emit("dup")
             self.emit(f"invokespecial {classe}/<init>()V")
         else:
             self.emit("aconst_null")
+
+    def emitir_valor_padrao(self, info, attr):
+        self.emit("aload_0")
+        self.empilhar_valor_padrao(attr.tipo)
         self.emit(f"putfield {info.nome}/{attr.nome} {OBJ}")
 
     def gerar_novo(self, info):
@@ -487,3 +491,86 @@ class GeradorJasmin:
         self.emit(f"goto {l_inicio}")
         self.rotulo(l_fim)
         self.emit("aconst_null")
+
+    # ------------------------------------------------------------------
+    # Fase 7: new, isvoid, let, case
+    # ------------------------------------------------------------------
+    def expr_New(self, no):
+        if no.tipo == SELF_TYPE:
+            # cada classe tem um _novo() que cria uma instância da própria classe dinâmica
+            self.emit("aload_0")
+            self.emit(f"invokevirtual {self.classe_atual.nome}/_novo(){OBJ}")
+        else:
+            classe = classe_jvm(no.tipo)       # Int/Bool/String/Object/IO -> runtime
+            self.emit(f"new {classe}")
+            self.emit("dup")
+            self.emit(f"invokespecial {classe}/<init>()V")
+
+    def expr_IsVoid(self, no):
+        l_verdade = self.novo_rotulo("Lvoid")
+        l_fim = self.novo_rotulo("Lfim")
+        self.expr(no.expr)
+        self.emit(f"ifnull {l_verdade}")
+        self.emit("iconst_0")
+        self.emit(f"goto {l_fim}")
+        self.rotulo(l_verdade)
+        self.emit("iconst_1")
+        self.rotulo(l_fim)
+        self.empacotar_bool()
+
+    def expr_Let(self, no):
+        """let x1 : T1 <- e1, ..., xn : Tn <- en in corpo.
+        Cada variável ganha um slot novo. O inicializador é gerado ANTES de a variável entrar
+        no escopo (ele enxerga as anteriores do mesmo let, mas não a própria). Sem
+        inicializador vale o valor padrão do tipo -- e isso é refeito a cada execução,
+        então um let dentro de um while recomeça do valor inicial a cada volta."""
+        marca = self.proximo_slot
+        self.escopos.append({})
+        for nome, tipo, inicializador in no.bindings:
+            if inicializador is not None:
+                self.expr(inicializador)
+            else:
+                self.empilhar_valor_padrao(tipo)
+            slot = self.alocar_slot()
+            self.emit(f"astore {slot}")
+            self.escopos[-1][nome] = slot
+        self.expr(no.corpo)
+        self.escopos.pop()
+        self.proximo_slot = marca          # libera os slots das variáveis do let
+
+    def expr_Case(self, no):
+        """case e of x1 : T1 => e1; ... esac.
+        Guarda o valor num slot, testa com `instanceof` na ordem do tipo mais específico
+        (maior profundidade na herança) para o menos específico, e executa o primeiro ramo
+        que casa. A variável do ramo reaproveita o próprio slot do valor.
+        Erros de execução: valor void, ou nenhum ramo casa."""
+        marca = self.proximo_slot
+        slot = self.alocar_slot()
+        l_ok = self.novo_rotulo("Lcaseok")
+        l_fim = self.novo_rotulo("Lfimcase")
+
+        self.expr(no.expr)
+        self.emit("dup")
+        self.emit(f"ifnonnull {l_ok}")
+        self.emit("invokestatic CoolRuntime/caseSobreVoid()LCoolRuntimeError;")
+        self.emit("athrow")
+        self.rotulo(l_ok)
+        self.emit(f"astore {slot}")
+
+        ramos = sorted(no.ramos, key=lambda r: -self.sem.profundidade(r[1]))
+        for nome, tipo, corpo in ramos:
+            l_proximo = self.novo_rotulo("Lproximo")
+            self.emit(f"aload {slot}")
+            self.emit(f"instanceof {classe_jvm(tipo)}")
+            self.emit(f"ifeq {l_proximo}")
+            self.escopos.append({nome: slot})
+            self.expr(corpo)
+            self.escopos.pop()
+            self.emit(f"goto {l_fim}")
+            self.rotulo(l_proximo)
+
+        self.emit(f"aload {slot}")
+        self.emit("invokestatic CoolRuntime/caseSemRamo(LCoolObject;)LCoolRuntimeError;")
+        self.emit("athrow")
+        self.rotulo(l_fim)
+        self.proximo_slot = marca

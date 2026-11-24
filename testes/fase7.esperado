@@ -1,0 +1,34 @@
+animal faz ...
+rex faz au au
+animal faz miau
+cachorro
+gato
+animal generico
+Int
+String
+Bool
+Object
+42
+5
+0
+Gato
+Cachorro
+0
+[]
+ok new Bool
+ok o void
+ok new Animal nao void
+ok while vale void
+ok o = o
+ok objetos distintos
+ok copia e outro objeto
+11
+11
+21
+0
+ok let sem init e void
+010|010|010|
+3
+1 -> 2 -> 3 -> nil
+6
+fim
