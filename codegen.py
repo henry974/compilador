@@ -15,10 +15,10 @@ Convenções (ver plano, Fase 0):
     O estático permite o despacho estático (e@T.f()) com invokestatic (Fase 5).
   * classes, construtores e métodos são sempre PUBLIC (CoolRuntime usa reflexão)
 
-Estado do desenvolvimento: Fase 5. Já geram código: literais, `self`, bloco, aritmética,
-~, not, comparações, `if`, variáveis (formais e atributos), atribuição, atributos com
-valor padrão/inicializador e despacho completo (dinâmico e estático, com checagem de void).
-O resto levanta NotImplementedError com a linha do fonte.
+Estado do desenvolvimento: Fase 6. Já geram código: literais, `self`, bloco, aritmética,
+~, not, comparações, `if`, `while`, variáveis (formais e atributos), atribuição, atributos
+com valor padrão/inicializador e despacho completo (dinâmico e estático, com checagem de void).
+Faltam: let, case, new, isvoid (Fase 7). Esses levantam NotImplementedError com a linha do fonte.
 """
 import os
 
@@ -460,7 +460,7 @@ class GeradorJasmin:
         else:
             raise NotImplementedError(f"operador unário '{no.op}' desconhecido")
 
-    # ---- if (adiantado da Fase 6) ----
+    # ---- if ----
     def expr_If(self, no):
         l_senao = self.novo_rotulo("Lsenao")
         l_fim = self.novo_rotulo("Lfim")
@@ -471,3 +471,19 @@ class GeradorJasmin:
         self.rotulo(l_senao)
         self.expr(no.senao)
         self.rotulo(l_fim)
+
+    # ---- while (Fase 6) ----
+    def expr_While(self, no):
+        """while c loop corpo pool : o valor do corpo é descartado e o while vale void (null).
+        A altura da pilha é a mesma no início do laço, no `goto` de volta e no rótulo de saída,
+        como o verificador de bytecode exige."""
+        l_inicio = self.novo_rotulo("Linicio")
+        l_fim = self.novo_rotulo("Lfimwhile")
+        self.rotulo(l_inicio)
+        self.expr_como_bool(no.cond)
+        self.emit(f"ifeq {l_fim}")
+        self.expr(no.corpo)
+        self.emit("pop")
+        self.emit(f"goto {l_inicio}")
+        self.rotulo(l_fim)
+        self.emit("aconst_null")
