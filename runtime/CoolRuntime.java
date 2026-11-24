@@ -11,6 +11,11 @@ import java.lang.reflect.InvocationTargetException;
  *
  * carrega a classe "Main" (gerada pelo compilador), cria um objeto e chama main().
  * O código gerado exige: classes, construtores e métodos PUBLIC.
+ *
+ * Erros de execução do COOL (abort, despacho/case sobre void, case sem ramo, divisão por zero,
+ * substr inválido, estouro de pilha, memória esgotada): a saída normal pendente é descarregada,
+ * a mensagem "Erro de execução: ..." vai para o stderr e o processo termina com código 1.
+ * Qualquer outra exceção é tratada como bug do gerador (stack trace no stderr, código 2).
  */
 public final class CoolRuntime {
 
@@ -63,8 +68,9 @@ public final class CoolRuntime {
 
     public static void main(String[] args) {
         final int[] codigo = {0};
-        // thread com pilha grande: programas COOL recursivos estouram a pilha padrão da JVM cedo demais
-        Thread t = new Thread(null, () -> codigo[0] = executar(), "cool-main", 1L << 29);
+        // thread com pilha de 256 MB: programas COOL recursivos estouram a pilha padrão da JVM
+        // (cerca de 1 MB) cedo demais; recursão infinita ainda termina rápido com erro de execução
+        Thread t = new Thread(null, () -> codigo[0] = executar(), "cool-main", 1L << 28);
         t.start();
         try {
             t.join();
@@ -101,6 +107,8 @@ public final class CoolRuntime {
             return falha("divisão por zero");
         if (e instanceof StackOverflowError)
             return falha("estouro da pilha (recursão muito profunda)");
+        if (e instanceof OutOfMemoryError)
+            return falha("memória esgotada");
         // qualquer outra coisa é quase certamente bug do gerador (ClassCastException, VerifyError...)
         OUT.flush();
         System.err.println("Erro interno do runtime (provável bug do gerador de código):");
