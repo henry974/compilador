@@ -185,92 +185,145 @@
 
 .method public static _s_main(LMain;)LCoolObject;
   .limit stack 64
-  .limit locals 1
+  .limit locals 3
   aload_0
   invokevirtual Main/mostra()LCoolObject;
   pop
+  new CoolString
+  dup
+  ldc "\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
   aload_0
   aload_0
   getfield Main/x LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid1
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid1:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   aload_0
   getfield Main/y LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid2
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid2:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   aload_0
   getfield Main/z LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
-  checkcast Main
-  new CoolString
   dup
-  ldc "\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  ifnonnull Lnaovoid3
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid3:
+  checkcast Main
+  aload 1
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   pop
+  new CoolString
+  dup
+  ldc "]\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
+  aload_0
+  getfield Main/s LCoolObject;
+  astore 2
   aload_0
   new CoolString
   dup
   ldc "["
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  checkcast Main
-  aload_0
-  getfield Main/s LCoolObject;
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  checkcast Main
-  new CoolString
   dup
-  ldc "]\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  ifnonnull Lnaovoid4
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid4:
+  checkcast Main
+  aload 2
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid5
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid5:
+  checkcast Main
+  aload 1
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   pop
   aload_0
   getfield Main/b LCoolObject;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao1
+  ifeq Lsenao6
   aload_0
   new CoolString
   dup
   ldc "ERRO b\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim2
-Lsenao1:
+  goto Lfim7
+Lsenao6:
   aload_0
   new CoolString
   dup
   ldc "ok b falso\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim2:
+Lfim7:
   pop
-  aload_0
-  aload_0
-  getfield Main/tmp LCoolObject;
-  invokevirtual Main/out_int(LCoolObject;)LCoolObject;
-  checkcast Main
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
+  aload_0
+  aload_0
+  getfield Main/tmp LCoolObject;
+  invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid8
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid8:
+  checkcast Main
+  aload 1
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   pop
+  new CoolString
+  dup
+  ldc "\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
   aload_0
   aload_0
   new CoolInt
@@ -283,35 +336,59 @@ Lfim2:
   invokespecial CoolInt/<init>(I)V
   invokevirtual Main/soma(LCoolObject;LCoolObject;)LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid9
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid9:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   aload_0
   invokevirtual Main/incrementa()LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid10
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid10:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   aload_0
   getfield Main/x LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid11
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid11:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   aload_0
   new CoolInt
@@ -320,22 +397,33 @@ Lfim2:
   invokespecial CoolInt/<init>(I)V
   invokevirtual Main/sombra(LCoolObject;)LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid12
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid12:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   aload_0
   getfield Main/x LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
-  checkcast Main
-  new CoolString
   dup
-  ldc "\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  ifnonnull Lnaovoid13
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid13:
+  checkcast Main
+  aload 1
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   pop
   aload_0
@@ -365,6 +453,11 @@ Lfim2:
   aload_0
   invokevirtual Main/mostra()LCoolObject;
   pop
+  new CoolString
+  dup
+  ldc "\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
   aload_0
   aload_0
   new CoolInt
@@ -374,22 +467,33 @@ Lfim2:
   dup_x1
   putfield Main/x LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid14
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid14:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   aload_0
   getfield Main/x LCoolObject;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
-  checkcast Main
-  new CoolString
   dup
-  ldc "\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  ifnonnull Lnaovoid15
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid15:
+  checkcast Main
+  aload 1
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   pop
   aload_0

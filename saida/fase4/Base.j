@@ -53,26 +53,50 @@
 
 .method public static _s_mostra(LBase;)LCoolObject;
   .limit stack 64
-  .limit locals 1
-  aload_0
-  aload_0
-  getfield Base/nome LCoolObject;
-  invokevirtual Base/out_string(LCoolObject;)LCoolObject;
-  checkcast Base
-  new CoolString
-  dup
-  ldc " "
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Base/out_string(LCoolObject;)LCoolObject;
-  checkcast Base
-  aload_0
-  getfield Base/total LCoolObject;
-  invokevirtual Base/out_int(LCoolObject;)LCoolObject;
-  checkcast Base
+  .limit locals 4
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
+  aload_0
+  getfield Base/total LCoolObject;
+  astore 2
+  new CoolString
+  dup
+  ldc " "
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 3
+  aload_0
+  aload_0
+  getfield Base/nome LCoolObject;
+  invokevirtual Base/out_string(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid1
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid1:
+  checkcast Base
+  aload 3
+  invokevirtual Base/out_string(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid2
+  ldc "out_int"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid2:
+  checkcast Base
+  aload 2
+  invokevirtual Base/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid3
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid3:
+  checkcast Base
+  aload 1
   invokevirtual Base/out_string(LCoolObject;)LCoolObject;
   areturn
 .end method

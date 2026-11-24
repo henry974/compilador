@@ -10,25 +10,37 @@ public final class CoolString extends CoolObject {
         this.value = value;
     }
 
-    /** String.length() : Int */
+    // ---- length() : Int ----
     public CoolObject length() {
-        return new CoolInt(value.length());
+        return _s_length(this);
     }
 
-    /** String.concat(s : String) : String */
+    public static CoolObject _s_length(CoolString self) {
+        return new CoolInt(self.value.length());
+    }
+
+    // ---- concat(s : String) : String ----
     public CoolObject concat(CoolObject s) {
-        return new CoolString(value + ((CoolString) s).value);
+        return _s_concat(this, s);
     }
 
-    /** String.substr(i : Int, l : Int) : String  -- erro de execução se fora do intervalo. */
+    public static CoolObject _s_concat(CoolString self, CoolObject s) {
+        return new CoolString(self.value + ((CoolString) s).value);
+    }
+
+    // ---- substr(i : Int, l : Int) : String -- erro de execução se fora do intervalo ----
     public CoolObject substr(CoolObject i, CoolObject l) {
+        return _s_substr(this, i, l);
+    }
+
+    public static CoolObject _s_substr(CoolString self, CoolObject i, CoolObject l) {
         long ini = ((CoolInt) i).value;
         long len = ((CoolInt) l).value;
-        if (ini < 0 || len < 0 || ini + len > value.length()) {
+        if (ini < 0 || len < 0 || ini + len > self.value.length()) {
             throw new CoolRuntimeError("substr fora do intervalo: substr(" + ini + ", " + len
-                    + ") em String de tamanho " + value.length());
+                    + ") em String de tamanho " + self.value.length());
         }
-        return new CoolString(value.substring((int) ini, (int) (ini + len)));
+        return new CoolString(self.value.substring((int) ini, (int) (ini + len)));
     }
 
     @Override

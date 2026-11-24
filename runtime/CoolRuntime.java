@@ -42,6 +42,11 @@ public final class CoolRuntime {
         return false;
     }
 
+    /** Despacho (dinâmico ou estático) sobre void. Uso no código gerado: invokestatic ... ; athrow */
+    public static CoolRuntimeError despachoSobreVoid(String metodo) {
+        return new CoolRuntimeError("despacho de '" + metodo + "' sobre um valor void");
+    }
+
     /** "case" sobre void. Uso no código gerado:  invokestatic ...caseSobreVoid()  ;  athrow */
     public static CoolRuntimeError caseSobreVoid() {
         return new CoolRuntimeError("case sobre uma expressão void");

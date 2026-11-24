@@ -49,7 +49,7 @@
 
 .method public static _s_main(LMain;)LCoolObject;
   .limit stack 64
-  .limit locals 1
+  .limit locals 3
   aload_0
   invokevirtual Main/ola()LCoolObject;
   pop
@@ -81,23 +81,39 @@
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   pop
+  new CoolString
+  dup
+  ldc "\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
+  new CoolString
+  dup
+  ldc "b"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 2
   aload_0
   new CoolString
   dup
   ldc "a"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  checkcast Main
-  new CoolString
   dup
-  ldc "b"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  ifnonnull Lnaovoid1
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid1:
+  checkcast Main
+  aload 2
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  checkcast Main
-  new CoolString
   dup
-  ldc "\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  ifnonnull Lnaovoid2
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid2:
+  checkcast Main
+  aload 1
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   areturn
 .end method

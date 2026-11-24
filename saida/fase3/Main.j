@@ -29,7 +29,12 @@
 
 .method public static _s_main(LMain;)LCoolObject;
   .limit stack 64
-  .limit locals 1
+  .limit locals 2
+  new CoolString
+  dup
+  ldc "\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -56,13 +61,21 @@
   iadd
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid1
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid1:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -89,13 +102,21 @@
   imul
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid2
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid2:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -122,13 +143,21 @@
   isub
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid3
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid3:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -145,13 +174,21 @@
   idiv
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid4
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid4:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -162,13 +199,21 @@
   ineg
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid5
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid5:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -189,13 +234,21 @@
   ineg
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid6
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid6:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -212,13 +265,21 @@
   iadd
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
+  dup
+  ifnonnull Lnaovoid7
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid7:
   checkcast Main
+  aload 1
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  pop
   new CoolString
   dup
   ldc "\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  pop
+  astore 1
   aload_0
   new CoolInt
   dup
@@ -245,11 +306,14 @@
   imul
   invokestatic CoolInt/of(I)LCoolInt;
   invokevirtual Main/out_int(LCoolObject;)LCoolObject;
-  checkcast Main
-  new CoolString
   dup
-  ldc "\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  ifnonnull Lnaovoid8
+  ldc "out_string"
+  invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;
+  athrow
+Lnaovoid8:
+  checkcast Main
+  aload 1
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   pop
   new CoolInt
@@ -264,83 +328,7 @@
   invokespecial CoolInt/<init>(I)V
   checkcast CoolInt
   getfield CoolInt/value I
-  if_icmplt Lverdade3
-  iconst_0
-  goto Lfim4
-Lverdade3:
-  iconst_1
-Lfim4:
-  invokestatic CoolBool/of(Z)LCoolBool;
-  checkcast CoolBool
-  getfield CoolBool/value Z
-  ifeq Lsenao1
-  aload_0
-  new CoolString
-  dup
-  ldc "ok 1 < 2\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim2
-Lsenao1:
-  aload_0
-  new CoolString
-  dup
-  ldc "ERRO 1 < 2\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim2:
-  pop
-  new CoolInt
-  dup
-  ldc 2
-  invokespecial CoolInt/<init>(I)V
-  checkcast CoolInt
-  getfield CoolInt/value I
-  new CoolInt
-  dup
-  ldc 2
-  invokespecial CoolInt/<init>(I)V
-  checkcast CoolInt
-  getfield CoolInt/value I
-  if_icmplt Lverdade7
-  iconst_0
-  goto Lfim8
-Lverdade7:
-  iconst_1
-Lfim8:
-  invokestatic CoolBool/of(Z)LCoolBool;
-  checkcast CoolBool
-  getfield CoolBool/value Z
-  ifeq Lsenao5
-  aload_0
-  new CoolString
-  dup
-  ldc "ERRO 2 < 2\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim6
-Lsenao5:
-  aload_0
-  new CoolString
-  dup
-  ldc "ok 2 < 2 e falso\n"
-  invokespecial CoolString/<init>(Ljava/lang/String;)V
-  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim6:
-  pop
-  new CoolInt
-  dup
-  ldc 2
-  invokespecial CoolInt/<init>(I)V
-  checkcast CoolInt
-  getfield CoolInt/value I
-  new CoolInt
-  dup
-  ldc 2
-  invokespecial CoolInt/<init>(I)V
-  checkcast CoolInt
-  getfield CoolInt/value I
-  if_icmple Lverdade11
+  if_icmplt Lverdade11
   iconst_0
   goto Lfim12
 Lverdade11:
@@ -353,7 +341,7 @@ Lfim12:
   aload_0
   new CoolString
   dup
-  ldc "ok 2 <= 2\n"
+  ldc "ok 1 < 2\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
   goto Lfim10
@@ -361,10 +349,86 @@ Lsenao9:
   aload_0
   new CoolString
   dup
-  ldc "ERRO 2 <= 2\n"
+  ldc "ERRO 1 < 2\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
 Lfim10:
+  pop
+  new CoolInt
+  dup
+  ldc 2
+  invokespecial CoolInt/<init>(I)V
+  checkcast CoolInt
+  getfield CoolInt/value I
+  new CoolInt
+  dup
+  ldc 2
+  invokespecial CoolInt/<init>(I)V
+  checkcast CoolInt
+  getfield CoolInt/value I
+  if_icmplt Lverdade15
+  iconst_0
+  goto Lfim16
+Lverdade15:
+  iconst_1
+Lfim16:
+  invokestatic CoolBool/of(Z)LCoolBool;
+  checkcast CoolBool
+  getfield CoolBool/value Z
+  ifeq Lsenao13
+  aload_0
+  new CoolString
+  dup
+  ldc "ERRO 2 < 2\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  goto Lfim14
+Lsenao13:
+  aload_0
+  new CoolString
+  dup
+  ldc "ok 2 < 2 e falso\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+Lfim14:
+  pop
+  new CoolInt
+  dup
+  ldc 2
+  invokespecial CoolInt/<init>(I)V
+  checkcast CoolInt
+  getfield CoolInt/value I
+  new CoolInt
+  dup
+  ldc 2
+  invokespecial CoolInt/<init>(I)V
+  checkcast CoolInt
+  getfield CoolInt/value I
+  if_icmple Lverdade19
+  iconst_0
+  goto Lfim20
+Lverdade19:
+  iconst_1
+Lfim20:
+  invokestatic CoolBool/of(Z)LCoolBool;
+  checkcast CoolBool
+  getfield CoolBool/value Z
+  ifeq Lsenao17
+  aload_0
+  new CoolString
+  dup
+  ldc "ok 2 <= 2\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+  goto Lfim18
+Lsenao17:
+  aload_0
+  new CoolString
+  dup
+  ldc "ERRO 2 <= 2\n"
+  invokespecial CoolString/<init>(Ljava/lang/String;)V
+  invokevirtual Main/out_string(LCoolObject;)LCoolObject;
+Lfim18:
   pop
   new CoolInt
   dup
@@ -378,31 +442,31 @@ Lfim10:
   invokespecial CoolInt/<init>(I)V
   checkcast CoolInt
   getfield CoolInt/value I
-  if_icmple Lverdade15
+  if_icmple Lverdade23
   iconst_0
-  goto Lfim16
-Lverdade15:
+  goto Lfim24
+Lverdade23:
   iconst_1
-Lfim16:
+Lfim24:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao13
+  ifeq Lsenao21
   aload_0
   new CoolString
   dup
   ldc "ERRO 3 <= 2\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim14
-Lsenao13:
+  goto Lfim22
+Lsenao21:
   aload_0
   new CoolString
   dup
   ldc "ok 3 <= 2 e falso\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim14:
+Lfim22:
   pop
   new CoolInt
   dup
@@ -416,22 +480,22 @@ Lfim14:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao17
+  ifeq Lsenao25
   aload_0
   new CoolString
   dup
   ldc "ok 3 = 3\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim18
-Lsenao17:
+  goto Lfim26
+Lsenao25:
   aload_0
   new CoolString
   dup
   ldc "ERRO 3 = 3\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim18:
+Lfim26:
   pop
   new CoolInt
   dup
@@ -445,22 +509,22 @@ Lfim18:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao19
+  ifeq Lsenao27
   aload_0
   new CoolString
   dup
   ldc "ERRO 3 = 4\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim20
-Lsenao19:
+  goto Lfim28
+Lsenao27:
   aload_0
   new CoolString
   dup
   ldc "ok 3 = 4 e falso\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim20:
+Lfim28:
   pop
   new CoolString
   dup
@@ -474,22 +538,22 @@ Lfim20:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao21
+  ifeq Lsenao29
   aload_0
   new CoolString
   dup
   ldc "ok strings iguais\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim22
-Lsenao21:
+  goto Lfim30
+Lsenao29:
   aload_0
   new CoolString
   dup
   ldc "ERRO strings iguais\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim22:
+Lfim30:
   pop
   new CoolString
   dup
@@ -503,22 +567,22 @@ Lfim22:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao23
+  ifeq Lsenao31
   aload_0
   new CoolString
   dup
   ldc "ERRO strings diferentes\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim24
-Lsenao23:
+  goto Lfim32
+Lsenao31:
   aload_0
   new CoolString
   dup
   ldc "ok strings diferentes\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim24:
+Lfim32:
   pop
   new CoolBool
   dup
@@ -532,22 +596,22 @@ Lfim24:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao25
+  ifeq Lsenao33
   aload_0
   new CoolString
   dup
   ldc "ok true = true\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim26
-Lsenao25:
+  goto Lfim34
+Lsenao33:
   aload_0
   new CoolString
   dup
   ldc "ERRO true = true\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim26:
+Lfim34:
   pop
   new CoolBool
   dup
@@ -560,22 +624,22 @@ Lfim26:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao27
+  ifeq Lsenao35
   aload_0
   new CoolString
   dup
   ldc "ok not false\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim28
-Lsenao27:
+  goto Lfim36
+Lsenao35:
   aload_0
   new CoolString
   dup
   ldc "ERRO not false\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim28:
+Lfim36:
   pop
   new CoolBool
   dup
@@ -588,22 +652,22 @@ Lfim28:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao29
+  ifeq Lsenao37
   aload_0
   new CoolString
   dup
   ldc "ERRO not true\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim30
-Lsenao29:
+  goto Lfim38
+Lsenao37:
   aload_0
   new CoolString
   dup
   ldc "ok not true e falso\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim30:
+Lfim38:
   pop
   new CoolInt
   dup
@@ -622,22 +686,22 @@ Lfim30:
   invokestatic CoolBool/of(Z)LCoolBool;
   checkcast CoolBool
   getfield CoolBool/value Z
-  ifeq Lsenao31
+  ifeq Lsenao39
   aload_0
   new CoolString
   dup
   ldc "ok not (1 = 2)\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-  goto Lfim32
-Lsenao31:
+  goto Lfim40
+Lsenao39:
   aload_0
   new CoolString
   dup
   ldc "ERRO not (1 = 2)\n"
   invokespecial CoolString/<init>(Ljava/lang/String;)V
   invokevirtual Main/out_string(LCoolObject;)LCoolObject;
-Lfim32:
+Lfim40:
   pop
   aload_0
   new CoolString

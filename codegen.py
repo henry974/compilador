@@ -15,9 +15,9 @@ Convenções (ver plano, Fase 0):
     O estático permite o despacho estático (e@T.f()) com invokestatic (Fase 5).
   * classes, construtores e métodos são sempre PUBLIC (CoolRuntime usa reflexão)
 
-Estado do desenvolvimento: Fase 4. Já geram código: literais, `self`, bloco, despacho
-dinâmico, aritmética, ~, not, comparações, `if`, variáveis (formais e atributos),
-atribuição e atributos com valor padrão/inicializador.
+Estado do desenvolvimento: Fase 5. Já geram código: literais, `self`, bloco, aritmética,
+~, not, comparações, `if`, variáveis (formais e atributos), atribuição, atributos com
+valor padrão/inicializador e despacho completo (dinâmico e estático, com checagem de void).
 O resto levanta NotImplementedError com a linha do fonte.
 """
 import os
@@ -119,6 +119,14 @@ class GeradorJasmin:
         self.escopos = [escopo]
         self.proximo_slot = len(formais) + 1
         self.max_locais = self.proximo_slot
+
+    def alocar_slot(self):
+        """Reserva um slot de variável local. Para liberar, restaure self.proximo_slot
+        ao valor que ele tinha antes das reservas (uso em pilha)."""
+        slot = self.proximo_slot
+        self.proximo_slot += 1
+        self.max_locais = max(self.max_locais, self.proximo_slot)
+        return slot
 
     # ------------------------------------------------------------------
     # ponto de entrada
@@ -319,23 +327,70 @@ class GeradorJasmin:
             if i < len(no.exprs) - 1:
                 self.emit("pop")           # só o valor da última expressão interessa
 
-    # ---- despacho dinâmico (Fase 5 completa: estático, void, etc.) ----
-    def expr_Dispatch(self, no):
-        if no.tipo_estatico is not None:
-            raise NotImplementedError(
-                f"despacho estático (@) ainda não implementado (Fase 5) (linha {getattr(no, 'linha', '?')})")
+    # ---- despacho (Fase 5) ----
+    def classe_declarante(self, classe, metodo):
+        """Primeira classe, subindo a partir de `classe`, que DECLARA o método `metodo`."""
+        for c in self.sem.ancestrais(classe):
+            if metodo in self.sem.classes[c].metodos:
+                return c
+        raise RuntimeError(f"método '{metodo}' não encontrado a partir de '{classe}'")
 
-        tipo_receptor = no.receptor.tipo_expr
-        classe = self.classe_atual.nome if tipo_receptor == SELF_TYPE else tipo_receptor
+    def verificar_nao_void(self, metodo):
+        """Com o receptor no topo da pilha: se for void (null), lança o erro de execução."""
+        l_ok = self.novo_rotulo("Lnaovoid")
+        self.emit("dup")
+        self.emit(f"ifnonnull {l_ok}")
+        self.emit(f'ldc "{metodo}"')
+        self.emit("invokestatic CoolRuntime/despachoSobreVoid(Ljava/lang/String;)LCoolRuntimeError;")
+        self.emit("athrow")
+        self.rotulo(l_ok)
+
+    def expr_Dispatch(self, no):
+        """e0.f(e1..en) e e0@T.f(e1..en).
+        Ordem de avaliação do manual do COOL: primeiro os argumentos (da esquerda para a
+        direita), depois o receptor e0. Na JVM o receptor precisa ficar embaixo dos
+        argumentos na pilha, então, quando o receptor não é `self`, os argumentos são
+        calculados primeiro e guardados em variáveis locais temporárias."""
+        n = len(no.argumentos)
+        receptor_e_self = type(no.receptor).__name__ == "Id" and no.receptor.nome == "self"
+        metodo = no.metodo
+
+        # classe usada no checkcast / na instrução de chamada
+        if no.tipo_estatico is not None:
+            classe = self.classe_declarante(no.tipo_estatico, metodo)
+        else:
+            tipo_receptor = no.receptor.tipo_expr
+            classe = self.classe_atual.nome if tipo_receptor == SELF_TYPE else tipo_receptor
+
+        marca_slots = self.proximo_slot
+        temporarios = []
+        if not receptor_e_self and n > 0:
+            temporarios = [self.alocar_slot() for _ in no.argumentos]
+            for argumento, slot in zip(no.argumentos, temporarios):
+                self.expr(argumento)
+                self.emit(f"astore {slot}")
 
         self.expr(no.receptor)
-        # o valor na pilha é CoolObject; o verificador exige o tipo da classe para invokevirtual
-        if not (type(no.receptor).__name__ == "Id" and no.receptor.nome == "self"):
+        if not receptor_e_self:
+            self.verificar_nao_void(metodo)
+            # o valor na pilha é CoolObject; o verificador exige o tipo da classe
             self.emit(f"checkcast {classe_jvm(classe)}")
-        for argumento in no.argumentos:
-            self.expr(argumento)
-        descritor = f"({OBJ * len(no.argumentos)}){OBJ}"
-        self.emit(f"invokevirtual {classe_jvm(classe)}/{no.metodo}{descritor}")
+
+        if temporarios:
+            for slot in temporarios:
+                self.emit(f"aload {slot}")
+        else:
+            for argumento in no.argumentos:
+                self.expr(argumento)
+
+        jvm = classe_jvm(classe)
+        if no.tipo_estatico is not None:
+            # despacho estático: chama direto o corpo (_s_f) da classe que declara o método
+            self.emit(f"invokestatic {jvm}/_s_{metodo}(L{jvm};{OBJ * n}){OBJ}")
+        else:
+            self.emit(f"invokevirtual {jvm}/{metodo}({OBJ * n}){OBJ}")
+
+        self.proximo_slot = marca_slots     # libera os temporários
 
     # ------------------------------------------------------------------
     # Fase 3: conversões entre objetos COOL e valores primitivos da JVM

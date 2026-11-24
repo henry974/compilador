@@ -1,23 +1,44 @@
-
+/**
+ * Classe Object do COOL. Toda classe COOL (inclusive as geradas pelo compilador)
+ * descende desta.
+ *
+ * Convenções:
+ *  - todos os métodos têm assinatura "apagada" (parâmetros e retorno CoolObject);
+ *  - cada método tem uma versão virtual (f) que só delega para uma versão ESTÁTICA (_s_f),
+ *    onde está a implementação. O despacho estático do COOL (e@Object.f()) usa a estática,
+ *    exatamente como o código gerado para as classes do usuário.
+ */
 public class CoolObject implements Cloneable {
 
     public CoolObject() {
     }
 
-    /** Object.abort(): encerra o programa com erro. */
+    // ---- abort ----
     public CoolObject abort() {
-        throw new CoolRuntimeError("abort() chamado em objeto da classe " + _nomeCool());
+        return _s_abort(this);
     }
 
-    /** Object.type_name(): nome da classe dinâmica, como String. */
+    public static CoolObject _s_abort(CoolObject self) {
+        throw new CoolRuntimeError("abort() chamado em objeto da classe " + self._nomeCool());
+    }
+
+    // ---- type_name ----
     public CoolObject type_name() {
-        return new CoolString(_nomeCool());
+        return _s_type_name(this);
     }
 
-    /** Object.copy(): cópia rasa (shallow copy). */
+    public static CoolObject _s_type_name(CoolObject self) {
+        return new CoolString(self._nomeCool());
+    }
+
+    // ---- copy (cópia rasa) ----
     public CoolObject copy() {
+        return _s_copy(this);
+    }
+
+    public static CoolObject _s_copy(CoolObject self) {
         try {
-            return (CoolObject) super.clone();
+            return (CoolObject) self.clone();
         } catch (CloneNotSupportedException e) {
             throw new CoolRuntimeError("falha ao copiar objeto: " + e.getMessage());
         }
@@ -25,7 +46,7 @@ public class CoolObject implements Cloneable {
 
     /**
      * Cria uma instância nova da classe dinâmica deste objeto (usado por "new SELF_TYPE").
-     * O compilador deve gerar uma redefinição deste método em cada classe do usuário.
+     * O compilador gera uma redefinição deste método em cada classe do usuário.
      */
     public CoolObject _novo() {
         return new CoolObject();

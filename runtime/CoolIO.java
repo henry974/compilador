@@ -2,27 +2,39 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/** Classe IO do COOL. Os métodos de saída devolvem SELF_TYPE (this). */
+/** Classe IO do COOL. Os métodos de saída devolvem SELF_TYPE (self). */
 public class CoolIO extends CoolObject {
     private static final BufferedReader ENTRADA = new BufferedReader(new InputStreamReader(System.in));
 
     public CoolIO() {
     }
 
-    /** IO.out_string(x : String) : SELF_TYPE */
+    // ---- out_string(x : String) : SELF_TYPE ----
     public CoolObject out_string(CoolObject x) {
+        return _s_out_string(this, x);
+    }
+
+    public static CoolObject _s_out_string(CoolIO self, CoolObject x) {
         CoolRuntime.OUT.print(((CoolString) x).value);
-        return this;
+        return self;
     }
 
-    /** IO.out_int(x : Int) : SELF_TYPE */
+    // ---- out_int(x : Int) : SELF_TYPE ----
     public CoolObject out_int(CoolObject x) {
-        CoolRuntime.OUT.print(((CoolInt) x).value);
-        return this;
+        return _s_out_int(this, x);
     }
 
-    /** IO.in_string() : String -- lê uma linha (sem o \n); EOF devolve "". */
+    public static CoolObject _s_out_int(CoolIO self, CoolObject x) {
+        CoolRuntime.OUT.print(((CoolInt) x).value);
+        return self;
+    }
+
+    // ---- in_string() : String -- lê uma linha (sem o \n); EOF devolve "" ----
     public CoolObject in_string() {
+        return _s_in_string(this);
+    }
+
+    public static CoolObject _s_in_string(CoolIO self) {
         CoolRuntime.OUT.flush(); // programas interativos: mostra o prompt antes de ler
         try {
             String linha = ENTRADA.readLine();
@@ -32,8 +44,12 @@ public class CoolIO extends CoolObject {
         }
     }
 
-    /** IO.in_int() : Int -- lê uma linha e converte; se não for um inteiro válido, devolve 0. */
+    // ---- in_int() : Int -- lê uma linha e converte; se não for inteiro válido, devolve 0 ----
     public CoolObject in_int() {
+        return _s_in_int(this);
+    }
+
+    public static CoolObject _s_in_int(CoolIO self) {
         CoolRuntime.OUT.flush();
         try {
             String linha = ENTRADA.readLine();

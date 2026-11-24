@@ -11,6 +11,10 @@ public class TesteRuntime {
         try { r.run(); return false; } catch (CoolRuntimeError e) { return true; }
     }
 
+    static boolean lancaNpe(Runnable r) {
+        try { r.run(); return false; } catch (NullPointerException e) { return true; }
+    }
+
     static String s(CoolObject o) { return ((CoolString) o).value; }
     static int i(CoolObject o) { return ((CoolInt) o).value; }
 
@@ -51,6 +55,13 @@ public class TesteRuntime {
         check("eq void = void", CoolRuntime.eq(null, null));
         check("eq void vs objeto", !CoolRuntime.eq(null, f));
         check("eq Int vs String", !CoolRuntime.eq(new CoolInt(1), new CoolString("1")));
+
+        // versões estáticas (usadas pelo despacho estático e@T.f())
+        check("_s_type_name estático", s(CoolObject._s_type_name(new Foo())).equals("Foo"));
+        check("_s_length estático", i(CoolString._s_length(oi)) == 5);
+        check("_s_out_string devolve self", CoolIO._s_out_string(new Foo(), new CoolString("")) != null);
+        check("_s_type_name sobre void lança NPE", lancaNpe(() -> CoolObject._s_type_name(null)));
+        check("despachoSobreVoid", CoolRuntime.despachoSobreVoid("f").getMessage().contains("'f'"));
 
         // conversão de entrada
         check("lerInteiro 42", CoolIO.lerInteiro("42") == 42);
