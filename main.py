@@ -3,6 +3,7 @@ from lexer import analisador_lexico
 from parser import Parser
 from errors import LexerError, ParseError
 from semantic import AnalisadorSemantico
+from codegen import GeradorJasmin
 
 def imprimir_ast(no, nivel=0):
     prefixo = "  " * nivel
@@ -47,11 +48,21 @@ def imprimir_ast(no, nivel=0):
     print(f"{prefixo}{no!r}")
 
 def main():
-    if len(sys.argv) < 2:
-        print("Uso: python3 main.py <arquivo.cl>")
+    args = sys.argv[1:]
+    pasta_saida = "saida"
+    if "--saida" in args:
+        i = args.index("--saida")
+        if i + 1 >= len(args):
+            print("Erro: --saida precisa de um diretório.")
+            sys.exit(1)
+        pasta_saida = args[i + 1]
+        del args[i:i + 2]
+
+    if not args:
+        print("Uso: python3 main.py <arquivo.cl> [--saida <diretório>]")
         sys.exit(1)
 
-    nome_arquivo = sys.argv[1]
+    nome_arquivo = args[0]
 
     try:
         with open(nome_arquivo, 'r') as f:
@@ -67,11 +78,6 @@ def main():
         print(e)
         sys.exit(1)
 
-    #  imprimir tokens pra debug
-    #for t in tokens:
-    #   print(t)
-    print("-" * 40)
-
     # 2) Sintático
     try:
         parser = Parser(tokens)
@@ -79,18 +85,25 @@ def main():
     except ParseError as e:
         print(e)
         sys.exit(1)
-
     print("Parse OK!")
+
     # 3) Semântico
-    erros = AnalisadorSemantico(ast).analisar()
+    analisador = AnalisadorSemantico(ast)
+    erros = analisador.analisar()
     if erros:
         for e in erros:
             print(e)
         print(f"{len(erros)} erro(s) semântico(s).")
         sys.exit(1)
-
     print("Análise semântica OK!")
-    #imprimir_ast(ast)
+
+    # 4) Geração de código (Jasmin)
+    try:
+        arquivos = GeradorJasmin(ast, analisador).gerar_programa(pasta_saida)
+    except NotImplementedError as e:
+        print(f"Erro de geração de código: {e}")
+        sys.exit(1)
+    print(f"Geração de código OK! {len(arquivos)} arquivo(s) .j em '{pasta_saida}'")
 
 if __name__ == "__main__":
     main()
